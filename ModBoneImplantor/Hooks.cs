@@ -121,7 +121,7 @@ namespace ModBoneImplantor
 
             // ボーン参照移し替え処理の挿入
             var methodAWSP = AccessTools.Method(typeof(AssignedAnotherWeights), nameof(AssignedAnotherWeights.AssignedWeightsAndSetBounds));
-            var idx = insts.FindIndex(x => x.opcode == OpCodes.Callvirt && x.operand == methodAWSP);
+            var idx = insts.FindIndex(x => x.opcode == OpCodes.Callvirt && x.operand is MethodInfo methodInfo1 && methodInfo1 == methodAWSP);
             insts[idx] = new CodeInstruction(OpCodes.Call, methodTransfer);
             insts.InsertRange(idx, new[]{
                 new CodeInstruction(OpCodes.Ldarg_0),
