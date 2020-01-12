@@ -81,8 +81,10 @@ namespace ModBoneImplantor
                 typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
                 "copyDynamicBone"
             );
+
             var methodImplantation = AccessTools.Method(typeof(Hooks), nameof(ExecuteImplantation));
             var methodTransfer = AccessTools.Method(typeof(Hooks), nameof(ExecuteRefTransfer));
+            var methodSetParent = AccessTools.Method(typeof(Transform), nameof(Transform.SetParent), new[] { typeof(Transform), typeof(bool) });
 
             // ボーン移植処理の挿入
             for(var i = 1; i < insts.Count; i++)
@@ -90,8 +92,8 @@ namespace ModBoneImplantor
                 var tmpInst = insts[i];
                 if(tmpInst.opcode == OpCodes.Ldarg_0 && tmpInst.labels.Count > 0)
                 {
-                    var prevInst = insts[i - 1].ToString();
-                    if(prevInst == "callvirt Void SetParent(UnityEngine.Transform, Boolean)" && insts.Count > i + 1)
+                    var prevInst = insts[i - 1];
+                    if(prevInst.opcode == OpCodes.Callvirt && prevInst.operand is MethodInfo methodInfo && methodInfo == methodSetParent && insts.Count > i + 1)
                     {
                         insts.InsertRange(i + 1, new[]{
 							// Ldarg_0(ラベル付き) ← Stfldの解決に使う
@@ -118,8 +120,8 @@ namespace ModBoneImplantor
             }
 
             // ボーン参照移し替え処理の挿入
-            var idx = insts.FindIndex(
-                inst => inst.ToString() == "callvirt Void AssignedWeightsAndSetBounds(UnityEngine.GameObject, System.String, Bounds, UnityEngine.Transform)");
+            var methodAWSP = AccessTools.Method(typeof(AssignedAnotherWeights), nameof(AssignedAnotherWeights.AssignedWeightsAndSetBounds));
+            var idx = insts.FindIndex(x => x.opcode == OpCodes.Callvirt && x.operand == methodAWSP);
             insts[idx] = new CodeInstruction(OpCodes.Call, methodTransfer);
             insts.InsertRange(idx, new[]{
                 new CodeInstruction(OpCodes.Ldarg_0),
