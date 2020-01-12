@@ -1,4 +1,5 @@
-﻿using BepInEx.Harmony;
+﻿using System;
+using BepInEx.Harmony;
 using HarmonyLib;
 using System.Collections.Generic;
 using System.Reflection;
@@ -82,9 +83,21 @@ namespace ModBoneImplantor
                 "copyDynamicBone"
             );
 
+            if (chaControl == null) throw new ArgumentNullException(nameof(chaControl));
+            if (locvar5 == null) throw new ArgumentNullException(nameof(locvar5));
+            if (loadObj == null) throw new ArgumentNullException(nameof(loadObj));
+            if (assetId == null) throw new ArgumentNullException(nameof(assetId));
+            if (assetName0 == null) throw new ArgumentNullException(nameof(assetName0));
+            if (copyWeightsMode == null) throw new ArgumentNullException(nameof(copyWeightsMode));
+            if (copyDB == null) throw new ArgumentNullException(nameof(copyDB));
+
             var methodImplantation = AccessTools.Method(typeof(Hooks), nameof(ExecuteImplantation));
             var methodTransfer = AccessTools.Method(typeof(Hooks), nameof(ExecuteRefTransfer));
             var methodSetParent = AccessTools.Method(typeof(Transform), nameof(Transform.SetParent), new[] { typeof(Transform), typeof(bool) });
+
+            if (methodImplantation == null) throw new ArgumentNullException(nameof(methodImplantation));
+            if (methodTransfer == null) throw new ArgumentNullException(nameof(methodTransfer));
+            if (methodSetParent == null) throw new ArgumentNullException(nameof(methodSetParent));
 
             // ボーン移植処理の挿入
             for(var i = 1; i < insts.Count; i++)
@@ -121,6 +134,7 @@ namespace ModBoneImplantor
 
             // ボーン参照移し替え処理の挿入
             var methodAWSP = AccessTools.Method(typeof(AssignedAnotherWeights), nameof(AssignedAnotherWeights.AssignedWeightsAndSetBounds));
+            if (methodAWSP == null) throw new ArgumentNullException(nameof(methodAWSP));
             var idx = insts.FindIndex(x => x.opcode == OpCodes.Callvirt && x.operand is MethodInfo methodInfo1 && methodInfo1 == methodAWSP);
             insts[idx] = new CodeInstruction(OpCodes.Call, methodTransfer);
             insts.InsertRange(idx, new[]{
