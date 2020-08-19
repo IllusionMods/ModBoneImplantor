@@ -61,11 +61,19 @@ namespace ModBoneImplantor
                 typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
                 "$locvar5"
             );
+#if KK
             var loadObj = AccessTools.Field(
                 typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance)
                                     .GetNestedType("<LoadCharaFbxDataAsync>c__AnonStorey20", BindingFlags.NonPublic | BindingFlags.Instance),
                 "newObj"
             );
+#elif EC
+            var loadObj = AccessTools.Field(
+                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance)
+                                    .GetNestedType("<LoadCharaFbxDataAsync>c__AnonStorey21", BindingFlags.NonPublic | BindingFlags.Instance),
+                "newObj"
+            );
+#endif
             var assetId = AccessTools.Field(
                 typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
                 "id"

@@ -1,11 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.852
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModBoneImplantor", "ModBoneImplantor\ModBoneImplantor.csproj", "{BC6F1689-CC99-4980-83B9-9BFB4E5F06D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_ModBoneImplantor", "ModBoneImplantor\KK_ModBoneImplantor.csproj", "{BC6F1689-CC99-4980-83B9-9BFB4E5F06D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EC_ModBoneImplantor", "EC_ModBoneImplantor\EC_ModBoneImplantor.csproj", "{35C65F5B-C033-49A5-ADF2-04AF4B418363}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{80E4C15B-9DAE-4938-B29A-78AE922B7AEE}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\Shared.projitems*{35c65f5b-c033-49a5-adf2-04af4b418363}*SharedItemsImports = 4
+		Shared\Shared.projitems*{80e4c15b-9dae-4938-b29a-78ae922b7aee}*SharedItemsImports = 13
+		Shared\Shared.projitems*{bc6f1689-cc99-4980-83b9-9bfb4e5f06d5}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -15,6 +24,10 @@ Global
 		{BC6F1689-CC99-4980-83B9-9BFB4E5F06D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC6F1689-CC99-4980-83B9-9BFB4E5F06D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC6F1689-CC99-4980-83B9-9BFB4E5F06D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35C65F5B-C033-49A5-ADF2-04AF4B418363}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35C65F5B-C033-49A5-ADF2-04AF4B418363}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35C65F5B-C033-49A5-ADF2-04AF4B418363}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35C65F5B-C033-49A5-ADF2-04AF4B418363}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
