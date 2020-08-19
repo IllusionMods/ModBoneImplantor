@@ -4,14 +4,15 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ModBoneImplantor")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
+#if KK
+[assembly: AssemblyTitle("ModBoneImplantor for Koikatsu")]
+#elif EC
+[assembly: AssemblyTitle("ModBoneImplantor for EmotionCreators")]
+#endif
+[assembly: AssemblyDescription("Needed by some clothing mods to add dynamic bones")]
 [assembly: AssemblyCompany("https://github.com/IllusionMods/ModBoneImplantor")]
 [assembly: AssemblyProduct("ModBoneImplantor")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
