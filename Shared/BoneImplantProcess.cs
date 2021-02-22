@@ -27,15 +27,15 @@ namespace ModBoneImplantor
         /// <param name="implantMain">実際の処理のデリゲート</param>
         public bool Exec(Func<Transform, Transform, bool> implantMain)
         {
-            if(implantMain == null)
+            if (implantMain == null)
             {
                 return false;
             }
 
-            if(trfSrc == null || trfDst == null || trfSrc == trfDst)
+            if (trfSrc == null || trfDst == null || trfSrc == trfDst)
             {
                 //初期値がおかしければコンソールで伝えて終了
-                ModBoneImplantor.Logger.Log(LogLevel.Error, $"Your BoneImplantProcess is invalid. trfSrc is {trfSrc.name} and trfDst is {trfDst.name}.");
+                ModBoneImplantor.Logger.Log(LogLevel.Error, $"Your BoneImplantProcess is invalid. trfSrc is {(trfSrc != null ? trfSrc.name : "NULL")} and trfDst is {(trfDst != null ? trfDst.name : "NULL")}.");
                 ModBoneImplantor.Logger.Log(LogLevel.Error, $"1) You must specify both trfSrc and trfDst.");
                 ModBoneImplantor.Logger.Log(LogLevel.Error, $"2) trfSrc must be different from trfDst.");
                 return false;
