@@ -1,156 +1,88 @@
 ﻿using System;
-using BepInEx.Harmony;
 using HarmonyLib;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 
 namespace ModBoneImplantor
 {
-    /// <summary>
-    /// Harmonyによるフック処理をまとめたクラス
-    /// </summary>
-    public static class Hooks
+    internal static class Hooks
     {
-        /// <summary>
-        /// フックメソッドをインストールする
-        /// </summary>
-        public static void InstallHooks()
+        private static Type _iteratorContainerType;
+
+        private static Type GetNestedType(Type baseType, string nestedTypeName)
         {
-            var harmony = new Harmony("com.rclcircuit.bepinex.modboneimplantor");
-
-            HarmonyWrapper.PatchAll(typeof(Hooks));
-
-            // 気になる点
-            // 1) 属性指定のみで入れ子クラスをパッチできるのかどうか
-            //    ↓をharmony.PatchAll()のように書きたい……
-            // 2) コンパイラが分解したコルーチン用のメソッドにパッチしてもいいのかどうか
-            //    Unity/Monoがコルーチンの処理で絶対に死なないかどうか
-            harmony.Patch(
-                AccessTools.Method(typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance), "MoveNext"),
-                null, null, new HarmonyMethod(typeof(Hooks), nameof(LoadCharaFbxDataAsyncTranspiler))
-            );
+            return baseType.GetNestedType(nestedTypeName, AccessTools.all) ?? throw new MissingMemberException("Failed to find " + nestedTypeName);
         }
 
-        /// <summary>
-        /// InitializeControlLoadObjectのポストフィックス
-        /// </summary>
+        public static void InstallHooks()
+        {
+            _iteratorContainerType = GetNestedType(typeof(ChaControl), "<LoadCharaFbxDataAsync>c__Iterator13");
+
+            var harmony = Harmony.CreateAndPatchAll(typeof(Hooks), ModBoneImplantor.GUID);
+
+            harmony.Patch(AccessTools.Method(_iteratorContainerType, "MoveNext"),
+                transpiler: new HarmonyMethod(typeof(Hooks), nameof(LoadCharaFbxDataAsyncTranspiler)));
+        }
+
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ChaControl), "InitializeControlLoadObject")]
         public static void InitializeControlLoadObjectPostfix(ChaControl __instance)
         {
-            // 管理用コンポーネントを追加する
-            var cim = __instance.gameObject.AddComponent<ChaImplantManager>();
+            __instance.gameObject.AddComponent<ChaImplantManager>();
         }
 
-        /// <summary>
-        /// LoadCharaFbxDataAsyncのトランスパイラ
-        /// </summary>
-        /// <param name="instructions"></param>
-        /// <returns></returns>
         public static IEnumerable<CodeInstruction> LoadCharaFbxDataAsyncTranspiler(IEnumerable<CodeInstruction> instructions)
         {
-            var insts = new List<CodeInstruction>(instructions);
-
-            var chaControl = AccessTools.Field(
-                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
-                "$this"
-            );
-            var locvar5 = AccessTools.Field(
-                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
-                "$locvar5"
-            );
+            var chaControl = AccessTools.Field(_iteratorContainerType, "$this");
+            var locvar5 = AccessTools.Field(_iteratorContainerType, "$locvar5");
 #if KK
-            var loadObj = AccessTools.Field(
-                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance)
-                                    .GetNestedType("<LoadCharaFbxDataAsync>c__AnonStorey20", BindingFlags.NonPublic | BindingFlags.Instance),
-                "newObj"
-            );
+            var loadObj = AccessTools.Field(GetNestedType(_iteratorContainerType, "<LoadCharaFbxDataAsync>c__AnonStorey20"), "newObj");
 #elif EC
-            var loadObj = AccessTools.Field(
-                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance)
-                                    .GetNestedType("<LoadCharaFbxDataAsync>c__AnonStorey21", BindingFlags.NonPublic | BindingFlags.Instance),
-                "newObj"
-            );
+            var loadObj = AccessTools.Field(GetNestedType(_iteratorContainerType, "<LoadCharaFbxDataAsync>c__AnonStorey21"), "newObj");
 #endif
-            var assetId = AccessTools.Field(
-                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
-                "id"
-            );
-            var assetName0 = AccessTools.Field(
-                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
-                "<assetName>__0"
-            );
-            var copyWeightsMode = AccessTools.Field(
-                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
-                "copyWeights"
-            );
-            var copyDB = AccessTools.Field(
-                typeof(ChaControl).GetNestedType("<LoadCharaFbxDataAsync>c__Iterator13", BindingFlags.NonPublic | BindingFlags.Instance),
-                "copyDynamicBone"
-            );
-
-            if (chaControl == null) throw new ArgumentNullException(nameof(chaControl));
-            if (locvar5 == null) throw new ArgumentNullException(nameof(locvar5));
-            if (loadObj == null) throw new ArgumentNullException(nameof(loadObj));
-            if (assetId == null) throw new ArgumentNullException(nameof(assetId));
-            if (assetName0 == null) throw new ArgumentNullException(nameof(assetName0));
-            if (copyWeightsMode == null) throw new ArgumentNullException(nameof(copyWeightsMode));
-            if (copyDB == null) throw new ArgumentNullException(nameof(copyDB));
+            var assetId = AccessTools.Field(_iteratorContainerType, "id");
+            var assetName0 = AccessTools.Field(_iteratorContainerType, "<assetName>__0");
+            var copyWeightsMode = AccessTools.Field(_iteratorContainerType, "copyWeights");
+            var copyDB = AccessTools.Field(_iteratorContainerType, "copyDynamicBone");
 
             var methodImplantation = AccessTools.Method(typeof(Hooks), nameof(ExecuteImplantation));
             var methodTransfer = AccessTools.Method(typeof(Hooks), nameof(ExecuteRefTransfer));
+
             var methodSetParent = AccessTools.Method(typeof(Transform), nameof(Transform.SetParent), new[] { typeof(Transform), typeof(bool) });
-
-            if (methodImplantation == null) throw new ArgumentNullException(nameof(methodImplantation));
-            if (methodTransfer == null) throw new ArgumentNullException(nameof(methodTransfer));
-            if (methodSetParent == null) throw new ArgumentNullException(nameof(methodSetParent));
-
-            // ボーン移植処理の挿入
-            for(var i = 1; i < insts.Count; i++)
-            {
-                var tmpInst = insts[i];
-                if(tmpInst.opcode == OpCodes.Ldarg_0 && tmpInst.labels.Count > 0)
-                {
-                    var prevInst = insts[i - 1];
-                    if(prevInst.opcode == OpCodes.Callvirt && prevInst.operand is MethodInfo methodInfo && methodInfo == methodSetParent && insts.Count > i + 1)
-                    {
-                        insts.InsertRange(i + 1, new[]{
-							// Ldarg_0(ラベル付き) ← Stfldの解決に使う
-							new CodeInstruction(OpCodes.Ldarg_0),
-                            new CodeInstruction(OpCodes.Ldfld, chaControl),
-                            new CodeInstruction(OpCodes.Ldarg_0),
-                            new CodeInstruction(OpCodes.Ldfld, locvar5),
-                            new CodeInstruction(OpCodes.Ldfld, loadObj),
-                            new CodeInstruction(OpCodes.Ldarg_0),
-                            new CodeInstruction(OpCodes.Ldfld, assetId),
-                            new CodeInstruction(OpCodes.Ldarg_0),
-                            new CodeInstruction(OpCodes.Ldfld, assetName0),
-                            new CodeInstruction(OpCodes.Ldarg_0),
-                            new CodeInstruction(OpCodes.Ldfld, copyWeightsMode),
-                            new CodeInstruction(OpCodes.Ldarg_0),
-                            new CodeInstruction(OpCodes.Ldfld, copyDB),
-                            new CodeInstruction(OpCodes.Call, methodImplantation),
-                            new CodeInstruction(OpCodes.Stfld, copyDB),
-                            new CodeInstruction(OpCodes.Ldarg_0) // オリジナルの処理の補完
-						});
-                        break;
-                    }
-                }
-            }
-
-            // ボーン参照移し替え処理の挿入
             var methodAWSP = AccessTools.Method(typeof(AssignedAnotherWeights), nameof(AssignedAnotherWeights.AssignedWeightsAndSetBounds));
-            if (methodAWSP == null) throw new ArgumentNullException(nameof(methodAWSP));
-            var idx = insts.FindIndex(x => x.opcode == OpCodes.Callvirt && x.operand is MethodInfo methodInfo1 && methodInfo1 == methodAWSP);
-            insts[idx] = new CodeInstruction(OpCodes.Call, methodTransfer);
-            insts.InsertRange(idx, new[]{
-                new CodeInstruction(OpCodes.Ldarg_0),
-                new CodeInstruction(OpCodes.Ldfld, chaControl)
-            });
-
-            return insts;
+            
+            return new CodeMatcher(instructions)
+                // Attach the ExecuteImplantation method
+                .MatchForward(true, new CodeMatch(OpCodes.Callvirt, methodSetParent), new CodeMatch(OpCodes.Ldarg_0))
+                .Advance(1)
+                .Insert(
+                    // Ldarg_0(ラベル付き) ← Stfldの解決に使う
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, chaControl),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, locvar5),
+                    new CodeInstruction(OpCodes.Ldfld, loadObj),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, assetId),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, assetName0),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, copyWeightsMode),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, copyDB),
+                    new CodeInstruction(OpCodes.Call, methodImplantation),
+                    new CodeInstruction(OpCodes.Stfld, copyDB),
+                    new CodeInstruction(OpCodes.Ldarg_0) // オリジナルの処理の補完
+                )
+                // Attach the ExecuteRefTransfer method
+                .Start()
+                .MatchForward(false, new CodeMatch(OpCodes.Callvirt, methodAWSP))
+                .SetInstruction(new CodeInstruction(OpCodes.Call, methodTransfer))
+                .Insert(
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldfld, chaControl))
+                .Instructions();
         }
 
         /// <summary>
@@ -167,14 +99,14 @@ namespace ModBoneImplantor
         {
             // カテゴリが衣服ではない、またはBoneImplantProcessが無ければ終了
             var bips = obj.GetComponentsInChildren<BoneImplantProcess>(true);
-            if(copyWeights != 1 || bips == null || bips.Length < 1)
+            if (copyWeights != 1 || bips == null || bips.Length < 1)
             {
                 return copyDynamicBone;
             }
 
             var cim = cc.gameObject.GetComponent<ChaImplantManager>();
             var aaw = (AssignedAnotherWeights)AccessTools.Field(typeof(ChaControl), "aaWeightsBody").GetValue(cc);
-            if(cim == null)
+            if (cim == null)
             {
                 return copyDynamicBone;
             }
@@ -183,10 +115,10 @@ namespace ModBoneImplantor
             cim.DestroyAndClearImplants(id, assetName);
 
             // BoneImplantProcessによる移植処理
-            foreach(var bip in bips)
+            foreach (var bip in bips)
             {
                 // 何らかの理由で失敗したら終了
-                if(!bip.Exec((src, dst) => cim.ImplantBones(id, assetName, src, dst, aaw.dictBone)))
+                if (!bip.Exec((src, dst) => cim.ImplantBones(id, assetName, src, dst, aaw.dictBone)))
                 {
                     return copyDynamicBone;
                 }
@@ -213,7 +145,7 @@ namespace ModBoneImplantor
             // BoneImplantProcessが無ければオリジナルの処理を実行して終了
             var cim = cc.gameObject.GetComponent<ChaImplantManager>();
             var bips = obj.GetComponentsInChildren<BoneImplantProcess>(true);
-            if(cim == null || bips == null || bips.Length < 1)
+            if (cim == null || bips == null || bips.Length < 1)
             {
                 aaw.AssignedWeightsAndSetBounds(obj, delTopName, bounds, rootBone);
                 return;

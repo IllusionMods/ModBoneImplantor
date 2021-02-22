@@ -36,6 +36,10 @@ namespace ModBoneImplantor
         /// <returns>移植成功したかどうか</returns>
         public bool ImplantBones(int id, string assetName, Transform src, Transform dst, Dictionary<string, GameObject> dictBone)
         {
+            if (src == null) throw new ArgumentNullException(nameof(src));
+            if (dst == null) throw new ArgumentNullException(nameof(dst));
+            if (dictBone == null) throw new ArgumentNullException(nameof(dictBone));
+
             if(dictBone.TryGetValue(dst.name, out GameObject objParent))
             {
                 // ボーン辞書中のdstと同名のtransformを親に設定
