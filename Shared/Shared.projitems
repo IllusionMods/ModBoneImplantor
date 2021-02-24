@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BoneImplantProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ChaImplantManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Hooks.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModBoneImplantor.cs" />
   </ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using System;
 using HarmonyLib;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 
@@ -29,130 +30,103 @@ namespace ModBoneImplantor
         [HarmonyPatch(typeof(ChaControl), "InitializeControlLoadObject")]
         public static void InitializeControlLoadObjectPostfix(ChaControl __instance)
         {
+            //todo This can create multiple copies? Should only one copy exist?
             __instance.gameObject.AddComponent<ChaImplantManager>();
         }
 
-        public static IEnumerable<CodeInstruction> LoadCharaFbxDataAsyncTranspiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> LoadCharaFbxDataAsyncTranspiler(IEnumerable<CodeInstruction> instructions)
         {
-            var chaControl = AccessTools.Field(_iteratorContainerType, "$this");
-            var locvar5 = AccessTools.Field(_iteratorContainerType, "$locvar5");
+            var chaControlF = AccessTools.Field(_iteratorContainerType, "$this");
 #if KK
-            var loadObj = AccessTools.Field(GetNestedType(_iteratorContainerType, "<LoadCharaFbxDataAsync>c__AnonStorey20"), "newObj");
+            var loadObjF = AccessTools.Field(GetNestedType(_iteratorContainerType, "<LoadCharaFbxDataAsync>c__AnonStorey20"), "newObj");
 #elif EC
-            var loadObj = AccessTools.Field(GetNestedType(_iteratorContainerType, "<LoadCharaFbxDataAsync>c__AnonStorey21"), "newObj");
+            var loadObjF = AccessTools.Field(GetNestedType(_iteratorContainerType, "<LoadCharaFbxDataAsync>c__AnonStorey21"), "newObj");
 #endif
-            var assetId = AccessTools.Field(_iteratorContainerType, "id");
-            var assetName0 = AccessTools.Field(_iteratorContainerType, "<assetName>__0");
-            var copyWeightsMode = AccessTools.Field(_iteratorContainerType, "copyWeights");
-            var copyDB = AccessTools.Field(_iteratorContainerType, "copyDynamicBone");
+            var copyDbF = AccessTools.Field(_iteratorContainerType, "copyDynamicBone");
 
-            var methodImplantation = AccessTools.Method(typeof(Hooks), nameof(ExecuteImplantation));
-            var methodTransfer = AccessTools.Method(typeof(Hooks), nameof(ExecuteRefTransfer));
-
-            var methodSetParent = AccessTools.Method(typeof(Transform), nameof(Transform.SetParent), new[] { typeof(Transform), typeof(bool) });
-            var methodAWSP = AccessTools.Method(typeof(AssignedAnotherWeights), nameof(AssignedAnotherWeights.AssignedWeightsAndSetBounds));
-            
             return new CodeMatcher(instructions)
                 // Attach the ExecuteImplantation method
-                .MatchForward(true, new CodeMatch(OpCodes.Callvirt, methodSetParent), new CodeMatch(OpCodes.Ldarg_0))
+                .MatchForward(true,
+                    new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(Transform), nameof(Transform.SetParent), new[] { typeof(Transform), typeof(bool) })),
+                    new CodeMatch(OpCodes.Ldarg_0))
                 .Advance(1)
                 .Insert(
-                    // Ldarg_0(ラベル付き) ← Stfldの解決に使う
                     new CodeInstruction(OpCodes.Ldarg_0),
-                    new CodeInstruction(OpCodes.Ldfld, chaControl),
+                    new CodeInstruction(OpCodes.Ldfld, chaControlF),
                     new CodeInstruction(OpCodes.Ldarg_0),
-                    new CodeInstruction(OpCodes.Ldfld, locvar5),
-                    new CodeInstruction(OpCodes.Ldfld, loadObj),
+                    new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(_iteratorContainerType, "$locvar5")),
+                    new CodeInstruction(OpCodes.Ldfld, loadObjF),
                     new CodeInstruction(OpCodes.Ldarg_0),
-                    new CodeInstruction(OpCodes.Ldfld, assetId),
+                    new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(_iteratorContainerType, "id")),
                     new CodeInstruction(OpCodes.Ldarg_0),
-                    new CodeInstruction(OpCodes.Ldfld, assetName0),
+                    new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(_iteratorContainerType, "<assetName>__0")),
                     new CodeInstruction(OpCodes.Ldarg_0),
-                    new CodeInstruction(OpCodes.Ldfld, copyWeightsMode),
+                    new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(_iteratorContainerType, "copyWeights")),
                     new CodeInstruction(OpCodes.Ldarg_0),
-                    new CodeInstruction(OpCodes.Ldfld, copyDB),
-                    new CodeInstruction(OpCodes.Call, methodImplantation),
-                    new CodeInstruction(OpCodes.Stfld, copyDB),
-                    new CodeInstruction(OpCodes.Ldarg_0) // オリジナルの処理の補完
+                    new CodeInstruction(OpCodes.Ldfld, copyDbF),
+                    new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Hooks), nameof(ExecuteImplantation))),
+                    new CodeInstruction(OpCodes.Stfld, copyDbF), // Override the copyDynamicBone field with return of the method
+                    new CodeInstruction(OpCodes.Ldarg_0) // Go back to a valid stack state
                 )
                 // Attach the ExecuteRefTransfer method
                 .Start()
-                .MatchForward(false, new CodeMatch(OpCodes.Callvirt, methodAWSP))
-                .SetInstruction(new CodeInstruction(OpCodes.Call, methodTransfer))
-                .Insert(
+                .MatchForward(false, new CodeMatch(OpCodes.Callvirt, AccessTools.Method(typeof(AssignedAnotherWeights), nameof(AssignedAnotherWeights.AssignedWeightsAndSetBounds))))
+                .SetInstruction(new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Hooks), nameof(CustomAssignedWeightsAndSetBounds)))) // Replace first method call only
+                .Insert( // Add instructions before the replaced method to feed it an extra ChaControl parameter
                     new CodeInstruction(OpCodes.Ldarg_0),
-                    new CodeInstruction(OpCodes.Ldfld, chaControl))
+                    new CodeInstruction(OpCodes.Ldfld, chaControlF))
                 .Instructions();
         }
 
-        /// <summary>
-        /// LoadCharaFbxDataAsyncTranspilerで注入されるメソッド。移植処理のメイン部分を実行する
-        /// </summary>
-        /// <param name="cc">モデルをロードしたキャラクタの情報</param>
-        /// <param name="obj">モデルの最上位のGameObject</param>
-        /// <param name="id">モデルのID</param>
-        /// <param name="assetName">モデルのアセット名</param>
-        /// <param name="copyWeights">0が髪型やアクセサリ、1が衣服</param>
-        /// <param name="copyDynamicBone">オリジナルの処理がDynamicBoneをコピーするか否か</param>
-        /// <returns>DynamicBoneのコピー処理がまだ必要か否か</returns>
-        public static bool ExecuteImplantation(ChaControl cc, GameObject obj, int id, string assetName, byte copyWeights, bool copyDynamicBone)
+        private static bool ExecuteImplantation(ChaControl cc, GameObject obj, int id, string assetName, byte copyWeights, bool copyDynamicBone)
         {
-            // カテゴリが衣服ではない、またはBoneImplantProcessが無ければ終了
-            var bips = obj.GetComponentsInChildren<BoneImplantProcess>(true);
-            if (copyWeights != 1 || bips == null || bips.Length < 1)
-            {
+            // copyWeights = 0 for accessories, 1 for clothes (cf_j_root), 2 for cf_J_N_FaceRoot
+            if (copyWeights != 1)
                 return copyDynamicBone;
-            }
 
             var cim = cc.gameObject.GetComponent<ChaImplantManager>();
-            var aaw = (AssignedAnotherWeights)AccessTools.Field(typeof(ChaControl), "aaWeightsBody").GetValue(cc);
             if (cim == null)
-            {
                 return copyDynamicBone;
-            }
 
+            var bips = obj.GetComponentsInChildren<BoneImplantProcess>(true);
+            if (bips.IsNullOrEmpty())
+                return copyDynamicBone;
+
+            // Support for loading once and then loading again in character edit
             // キャラエディットで1回読み込んだ後、再度読み込む場合に対応
             cim.DestroyAndClearImplants(id, assetName);
 
-            // BoneImplantProcessによる移植処理
+            var aaw = (AssignedAnotherWeights)AccessTools.Field(typeof(ChaControl), "aaWeightsBody").GetValue(cc);
+
             foreach (var bip in bips)
             {
-                // 何らかの理由で失敗したら終了
-                if (!bip.Exec((src, dst) => cim.ImplantBones(id, assetName, src, dst, aaw.dictBone)))
-                {
+                if (!cim.ImplantBones(id, assetName, bip, aaw))
                     return copyDynamicBone;
-                }
             }
 
+            // Ignore the case where copyDynamicBone is false and reconfigure DynamicBone when the garment category and bone transplant is successful.
             // 衣服カテゴリかつボーン移植に成功したとき、copyDynamicBoneがfalseの場合を無視してDynamicBoneを再設定する
             cim.ForceRescueDynamicBone(cc, obj, aaw.dictBone);
 
+            // Do not execute the original DynamicBone reconfiguration process.
             // オリジナルのDynamicBone再設定処理を実行しない
             return false;
         }
 
-        /// <summary>
-        /// LoadCharaFbxDataAsyncTranspilerで注入されるメソッド。主にボーン参照の移し替えを実行する
-        /// </summary>
-        /// <param name="aaw">ボーン共有用の情報が含まれるインスタンス</param>
-        /// <param name="obj">読み込まれたモデルの最上位のGameObject</param>
-        /// <param name="delTopName">削除されるツリーの最上位のGameObject</param>
-        /// <param name="bounds">境界情報のインスタンス</param>
-        /// <param name="rootBone">SkinnedMeshRendererのrootBoneに設定するTransform</param>
-        /// <param name="cc">モデルを読み込んだキャラのChaControlコンポーネント</param>
-        public static void ExecuteRefTransfer(AssignedAnotherWeights aaw, GameObject obj, string delTopName, Bounds bounds, Transform rootBone, ChaControl cc)
+        private static void CustomAssignedWeightsAndSetBounds(AssignedAnotherWeights aaw, GameObject obj, string delTopName, Bounds bounds, Transform rootBone, ChaControl cc)
         {
-            // BoneImplantProcessが無ければオリジナルの処理を実行して終了
             var cim = cc.gameObject.GetComponent<ChaImplantManager>();
-            var bips = obj.GetComponentsInChildren<BoneImplantProcess>(true);
-            if (cim == null || bips == null || bips.Length < 1)
+            // todo any better way than running GetComponentsInChildren?
+            if (cim == null || obj.GetComponentsInChildren<BoneImplantProcess>(true).IsNullOrEmpty())
             {
+                // Run the original method
                 aaw.AssignedWeightsAndSetBounds(obj, delTopName, bounds, rootBone);
-                return;
             }
-
-            // SkinnedMeshRendererのボーン参照を移し替える
-            cim.TransferBoneReference(obj, delTopName, bounds, rootBone, aaw.dictBone);
+            else
+            {
+                // Run our replacement method
+                cim.TransferBoneReference(obj, delTopName, bounds, rootBone, aaw.dictBone);
+            }
         }
     }
 }

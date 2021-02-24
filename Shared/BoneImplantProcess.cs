@@ -1,6 +1,4 @@
-﻿using BepInEx.Logging;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ModBoneImplantor
 {
@@ -25,31 +23,5 @@ namespace ModBoneImplantor
         /// 移植先の親ボーン
         /// </summary>
         public Transform trfDst;
-
-        /// <summary>
-        /// Transplant execution
-        /// 移植実行
-        /// </summary>
-        /// <param name="implantMain">
-        /// Actually executed delegate
-        /// 実際の処理のデリゲート
-        /// </param>.
-        public bool Exec(Func<Transform, Transform, bool> implantMain)
-        {
-            if (implantMain == null)
-            {
-                return false;
-            }
-
-            if (trfSrc == null || trfDst == null || trfSrc == trfDst)
-            {
-                ModBoneImplantor.Logger.Log(LogLevel.Error, $"Your BoneImplantProcess is invalid. trfSrc is {(trfSrc != null ? trfSrc.name : "NULL")} and trfDst is {(trfDst != null ? trfDst.name : "NULL")}.");
-                ModBoneImplantor.Logger.Log(LogLevel.Error, $"1) You must specify both trfSrc and trfDst.");
-                ModBoneImplantor.Logger.Log(LogLevel.Error, $"2) trfSrc must be different from trfDst.");
-                return false;
-            }
-
-            return implantMain(trfSrc, trfDst);
-        }
     }
 }
