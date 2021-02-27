@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using HarmonyLib;
 using UnityEngine;
 
 namespace ModBoneImplantor
@@ -34,6 +37,25 @@ namespace ModBoneImplantor
         {
             if (self == null) return string.Empty;
             return $"{self.gameObject.GetFullPath()} [{self.GetType().Name}]";
+        }
+
+        public static Dictionary<string, GameObject> GetBodyBoneDict(this ChaControl ctrl)
+        {
+            var aaw = Traverse.Create(ctrl).Field<AssignedAnotherWeights>("aaWeightsBody").Value;
+            return aaw.dictBone;
+        }
+
+        public static Dictionary<string, GameObject> GetBoneDict(this SkinnedMeshRenderer dst)
+        {
+            return dst.bones.Where(x => x != null).ToDictionary(x => x.name, x => x.gameObject);
+        }
+
+        public static Transform GetTopmostParent(this Component src)
+        {
+            var topmostParent = src.transform;
+            while (topmostParent.parent)
+                topmostParent = topmostParent.parent;
+            return topmostParent;
         }
     }
 }

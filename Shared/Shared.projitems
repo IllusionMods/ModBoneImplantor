@@ -12,7 +12,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BoneImplantProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Hooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\AssignedAnotherWeightsHooks.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModBoneImplantor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\UncensorSelectorSupport.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Hooks\" />
   </ItemGroup>
 </Project>
