@@ -47,12 +47,14 @@ namespace ModBoneImplantor
                     }
                 }
 
+                var bodyBoneDict = __instance.ChaControl.GetBodyBoneDict(); /* try dst.GetBoneDict() if there are any missing bones */
+
                 // Figure out the root object of the instantiated uncensor object and use it to figure out which renderers should share the instantiated bones
                 var topmostParent = src.GetTopmostParent();
                 // Cache results of bone implanting and reuse them on renderers from the same instantiated uncensor object
                 if (!_implantedBones.TryGetValue(topmostParent, out var implantedBonesData))
                 {
-                    TryImplantBones(topmostParent.gameObject, dst.GetBoneDict(), out var implantedBones,
+                    TryImplantBones(topmostParent.gameObject, bodyBoneDict, out var implantedBones,
                         out var dbColliders);
 
                     implantedBonesData = new ImplantedBoneInfo(implantedBones, dbColliders);
@@ -87,7 +89,7 @@ namespace ModBoneImplantor
                     else
                     {
                         // This branch shouldn't happen in most cases so do a lazy init to avoid the reflection cost
-                        if (bodyBonesDict == null) bodyBonesDict = __instance.ChaControl.GetBodyBoneDict();
+                        if (bodyBonesDict == null) bodyBonesDict = bodyBoneDict;
                         // Use the equivalent bone from the body skeleton if found
                         if (bodyBonesDict.TryGetValue(rendererBone.name, out var bodyBone))
                             reassignedBoneArr[i] = bodyBone.transform;
