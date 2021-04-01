@@ -24,18 +24,14 @@ namespace ModBoneImplantor
             UncensorSelectorSupport.InstallHooks(hi);
         }
 
-        private static bool TryImplantBones(GameObject loadedObj, Dictionary<string, GameObject> existingBoneDict,
-            out List<Transform> implantedBones, out List<DynamicBoneCollider> implantedColliders)
+        private static ImplantedBoneInfo TryImplantBones(GameObject loadedObj, Dictionary<string, GameObject> existingBoneDict)
         {
-            implantedColliders = null;
-            implantedBones = null;
-
             var implants = loadedObj.GetComponentsInChildren<BoneImplantProcess>();
-            if (implants.Length == 0) return false;
+            if (implants.Length == 0) return null;
 
             // Implant extra bones from the object into base body skeleton based on BoneImplantProcess components attached to the object
-            implantedBones = new List<Transform>(implants.Length);
-            implantedColliders = new List<DynamicBoneCollider>(implants.Length);
+            var implantedBones = new List<Transform>(implants.Length);
+            var implantedColliders = new List<DynamicBoneCollider>(implants.Length);
             foreach (var implantInfo in implants)
             {
                 var boneToImplant = implantInfo.trfSrc;
@@ -62,7 +58,8 @@ namespace ModBoneImplantor
             }
 
             Logger.LogDebug($"Found {implants.Length} instances of BoneImplantProcess. In total {implantedBones.Count} bones were implanted.");
-            return true;
+
+            return new ImplantedBoneInfo(implantedBones, implantedColliders);
         }
     }
 }

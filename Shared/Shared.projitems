@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BoneImplantProcess.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Hooks\AssignedAnotherWeightsHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ImplantedBoneInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ModBoneImplantor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Hooks\UncensorSelectorSupport.cs" />
   </ItemGroup>

@@ -40,7 +40,10 @@ namespace ModBoneImplantor
                             Logger.LogDebug($"Removing {kvp.Value.ImplantedBones.Count} no longer used implanted bones");
 
                             foreach (var implantedBone in kvp.Value.ImplantedBones)
-                                Destroy(implantedBone.gameObject);
+                            {
+                                if (implantedBone != null)
+                                    Destroy(implantedBone.gameObject);
+                            }
                         }
 
                         _implantedBones.Remove(kvp.Key);
@@ -54,10 +57,8 @@ namespace ModBoneImplantor
                 // Cache results of bone implanting and reuse them on renderers from the same instantiated uncensor object
                 if (!_implantedBones.TryGetValue(topmostParent, out var implantedBonesData))
                 {
-                    TryImplantBones(topmostParent.gameObject, bodyBoneDict, out var implantedBones,
-                        out var dbColliders);
-
-                    implantedBonesData = new ImplantedBoneInfo(implantedBones, dbColliders);
+                    implantedBonesData = TryImplantBones(topmostParent.gameObject, bodyBoneDict);
+                    if (implantedBonesData == null) return true;
                     _implantedBones[topmostParent] = implantedBonesData;
                 }
 
@@ -107,19 +108,6 @@ namespace ModBoneImplantor
                 dst.bones = reassignedBoneArr;
 
                 return false;
-            }
-
-            private sealed class ImplantedBoneInfo
-            {
-                public readonly List<Transform> ImplantedBones;
-                public readonly List<DynamicBoneCollider> ImplantedColliders;
-                public readonly HashSet<SkinnedMeshRenderer> Usages = new HashSet<SkinnedMeshRenderer>();
-
-                public ImplantedBoneInfo(List<Transform> implantedBones, List<DynamicBoneCollider> implantedColliders)
-                {
-                    ImplantedBones = implantedBones;
-                    ImplantedColliders = implantedColliders;
-                }
             }
         }
     }

@@ -23,7 +23,7 @@ namespace ModBoneImplantor
 #if DEBUG
                 Console.WriteLine("AssignedWeightsAndSetBoundsHook");
 #endif
-                return !AssignWeightsAndImplantBones(__instance, obj, delTopName, bounds, rootBone);
+                return AssignWeightsAndImplantBones(__instance, obj, delTopName, bounds, rootBone);
             }
 
             [HarmonyPrefix]
@@ -33,20 +33,23 @@ namespace ModBoneImplantor
 #if DEBUG
                 Console.WriteLine("AssignedWeightsHook");
 #endif
-                return !AssignWeightsAndImplantBones(__instance, obj, delTopName, default(Bounds), rootBone);
+                return AssignWeightsAndImplantBones(__instance, obj, delTopName, default(Bounds), rootBone);
             }
 
             /// <summary>
             /// The full functionality of the plugin pretty much.
             /// Replaces the AssignedWeights* methods from AssignedAnotherWeights.
-            /// If no BoneImplantProcess instances are found then it returns false and lets the stock method run instead to improve compatibility and safety.
+            /// If no BoneImplantProcess instances are found then it returns true and lets the stock method run instead to improve compatibility and safety.
             /// </summary>
             private static bool AssignWeightsAndImplantBones(AssignedAnotherWeights aaw, GameObject obj, string delTopName, Bounds bounds, Transform rootBone)
             {
                 var dictBone = aaw.dictBone;
 
-                if (!TryImplantBones(obj, dictBone, out var implantedBones, out var dbColliders))
-                    return false;
+                var info = TryImplantBones(obj, dictBone);
+                if (info == null) return true;
+
+                var implantedBones = info.ImplantedBones;
+                var dbColliders = info.ImplantedColliders;
 
                 var renderers = obj.GetComponentsInChildren<SkinnedMeshRenderer>();
                 if (renderers.Length == 0)
@@ -56,7 +59,7 @@ namespace ModBoneImplantor
                                       $"Object: {obj.GetFullPath()}");
                     // Clean up since they won't be used
                     foreach (var implantedBone in implantedBones) Destroy(implantedBone);
-                    return false;
+                    return true;
                 }
 
                 // Remove implanted bones once all renderers that use them are destroyed
@@ -68,7 +71,10 @@ namespace ModBoneImplantor
                     {
                         Logger.LogDebug($"Removing {implantedBones.Count} no longer used implanted bones");
                         foreach (var implantedBone in implantedBones)
-                            Destroy(implantedBone.gameObject);
+                        {
+                            if (implantedBone != null)
+                                Destroy(implantedBone.gameObject);
+                        }
                     }
                 }
 
@@ -124,7 +130,7 @@ namespace ModBoneImplantor
 
                 obj.transform.FindLoop(delTopName).FancyDestroy(false, true);
 
-                return true;
+                return false;
             }
         }
     }
