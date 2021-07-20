@@ -15,12 +15,19 @@ namespace ModBoneImplantor
 
             public static void InstallHooks(Harmony hi)
             {
-                var mi = Type.GetType("KK_Plugins.UncensorSelector, KK_UncensorSelector", false)?
+#if KK
+                var typeName = "KK_Plugins.UncensorSelector, KK_UncensorSelector";
+#elif EC
+                var typeName = "KK_Plugins.UncensorSelector, EC_UncensorSelector";
+#elif KKS
+                var typeName = "KK_Plugins.UncensorSelector, KKS_UncensorSelector";
+#endif
+                var mi = Type.GetType(typeName, false)?
                     .GetNestedType("UncensorSelectorController", AccessTools.all)?
                     .GetMethod("TransferBones", AccessTools.all);
 
                 if (mi == null)
-                    Logger.LogWarning("Could not find KK_Plugins.UncensorSelector.UncensorSelectorController.TransferBones - Make sure your UncensorSelector is up to date!");
+                    Logger.LogWarning("Could not find UncensorSelectorController.TransferBones - Make sure your UncensorSelector is up to date!");
                 else
                     hi.Patch(mi, new HarmonyMethod(typeof(UncensorSelectorSupport), nameof(TransferBonesOverride)));
             }
