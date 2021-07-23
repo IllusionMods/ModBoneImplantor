@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_ModBoneImplantor", "ModBoneImplantor\KK_ModBoneImplantor.csproj", "{BC6F1689-CC99-4980-83B9-9BFB4E5F06D5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_ModBoneImplantor", "KK_ModBoneImplantor\KK_ModBoneImplantor.csproj", "{BC6F1689-CC99-4980-83B9-9BFB4E5F06D5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EC_ModBoneImplantor", "EC_ModBoneImplantor\EC_ModBoneImplantor.csproj", "{35C65F5B-C033-49A5-ADF2-04AF4B418363}"
 EndProject
