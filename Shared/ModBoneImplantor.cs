@@ -8,6 +8,7 @@ namespace ModBoneImplantor
 {
     [BepInPlugin(GUID, "Mod Bone Implantor", Version)]
     [BepInDependency("com.deathweasel.bepinex.uncensorselector", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(KKAPI.KoikatuAPI.GUID, KKAPI.KoikatuAPI.VersionConst)]
     public partial class ModBoneImplantor : BaseUnityPlugin
     {
         public const string GUID = "com.rclcircuit.bepinex.modboneimplantor";
