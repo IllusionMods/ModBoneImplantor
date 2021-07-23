@@ -5,7 +5,7 @@ else {
     $dir = $PSScriptRoot + "\bin\"
 }
 
-$array = @("KK", "EC")
+$array = @("KK", "EC", "KKS")
 
 function CreateZip ($element)
 {
