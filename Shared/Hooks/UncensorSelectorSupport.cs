@@ -16,11 +16,11 @@ namespace ModBoneImplantor
             public static void InstallHooks(Harmony hi)
             {
 #if KK
-                var typeName = "KK_Plugins.UncensorSelector, KK_UncensorSelector";
+                const string typeName = "KK_Plugins.UncensorSelector, KK_UncensorSelector";
 #elif EC
-                var typeName = "KK_Plugins.UncensorSelector, EC_UncensorSelector";
+                const string typeName = "KK_Plugins.UncensorSelector, EC_UncensorSelector";
 #elif KKS
-                var typeName = "KK_Plugins.UncensorSelector, KKS_UncensorSelector";
+                const string typeName = "KK_Plugins.UncensorSelector, KKS_UncensorSelector";
 #endif
                 var mi = Type.GetType(typeName, false)?
                     .GetNestedType("UncensorSelectorController", AccessTools.all)?
@@ -75,7 +75,6 @@ namespace ModBoneImplantor
                     return true;
 
                 var existingBoneDict = dst.GetBoneDict();
-                var bodyBonesDict = (Dictionary<string, GameObject>)null;
 
                 var boneCount = src.bones.Length;
                 var reassignedBoneArr = new Transform[boneCount];
@@ -96,10 +95,9 @@ namespace ModBoneImplantor
                     }
                     else
                     {
-                        // This branch shouldn't happen in most cases so do a lazy init to avoid the reflection cost
-                        if (bodyBonesDict == null) bodyBonesDict = bodyBoneDict;
+                        // This branch shouldn't happen in most cases
                         // Use the equivalent bone from the body skeleton if found
-                        if (bodyBonesDict.TryGetValue(rendererBone.name, out var bodyBone))
+                        if (bodyBoneDict.TryGetValue(rendererBone.name, out var bodyBone))
                             reassignedBoneArr[i] = bodyBone.transform;
                         else
                         {
