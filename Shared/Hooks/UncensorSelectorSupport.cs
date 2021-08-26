@@ -21,6 +21,10 @@ namespace ModBoneImplantor
                 const string typeName = "KK_Plugins.UncensorSelector, EC_UncensorSelector";
 #elif KKS
                 const string typeName = "KK_Plugins.UncensorSelector, KKS_UncensorSelector";
+#elif HS2
+                const string typeName = "KK_Plugins.UncensorSelector, HS2_UncensorSelector";
+#elif AIS
+                const string typeName = "KK_Plugins.UncensorSelector, AI_UncensorSelector";
 #endif
                 var mi = Type.GetType(typeName, false)?
                     .GetNestedType("UncensorSelectorController", AccessTools.all)?

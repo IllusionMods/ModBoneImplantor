@@ -128,7 +128,7 @@ namespace ModBoneImplantor
                     Logger.LogDebug($"Found {dbColliders.Count} DynamicBoneColliders on the implanted bones. They were added to {dynamicBones.Length} DynamicBones (alongside colliders attached to the base body).");
                 }
 
-                obj.transform.FindLoop(delTopName).FancyDestroy(false, true);
+                obj.transform.FindLoop(delTopName).gameObject.FancyDestroy(false, true);
 
                 return false;
             }

@@ -39,9 +39,9 @@ namespace ModBoneImplantor
                 var targetParentBone = implantInfo.trfDst;
                 if (boneToImplant == null || targetParentBone == null || boneToImplant == targetParentBone)
                 {
-                    Logger.Log(LogLevel.Error, $"Your BoneImplantProcess is invalid. trfSrc is {(boneToImplant != null ? boneToImplant.name : "NULL")} and trfDst is {(targetParentBone != null ? targetParentBone.name : "NULL")}.");
-                    Logger.Log(LogLevel.Error, "1) You must specify both trfSrc and trfDst.");
-                    Logger.Log(LogLevel.Error, "2) trfSrc must be different from trfDst.");
+                    Logger.LogError($"Your BoneImplantProcess is invalid. trfSrc is {(boneToImplant != null ? boneToImplant.name : "NULL")} and trfDst is {(targetParentBone != null ? targetParentBone.name : "NULL")}.");
+                    Logger.LogError("1) You must specify both trfSrc and trfDst.");
+                    Logger.LogError("2) trfSrc must be different from trfDst.");
                 }
                 // Find a bone in the body skeleton with the same name as the trfDst bone in the BoneImplantProcess
                 else if (existingBoneDict.TryGetValue(targetParentBone.name, out var targetDstObj))
@@ -52,9 +52,9 @@ namespace ModBoneImplantor
                 }
                 else
                 {
-                    Logger.Log(LogLevel.Error, $"Your BoneImplantProcess is invalid: trfDst wasn't found in the body bones. trfDst is {targetParentBone.name}.");
-                    Logger.Log(LogLevel.Error, "trfDst must be a bone stored in the same structure as official body skeleton (name must match).");
-                    Logger.Log(LogLevel.Error, "trfDst cannot be set to original bone or placeholder object such as cf_o_root.");
+                    Logger.LogError($"Your BoneImplantProcess is invalid: trfDst wasn't found in the body bones. trfDst is {targetParentBone.name}.");
+                    Logger.LogError("trfDst must be a bone stored in the same structure as official body skeleton (name must match).");
+                    Logger.LogError("trfDst cannot be set to original bone or placeholder object such as cf_o_root.");
                 }
             }
 
