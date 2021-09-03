@@ -12,7 +12,7 @@ namespace ModBoneImplantor
     public partial class ModBoneImplantor : BaseUnityPlugin
     {
         public const string GUID = "com.rclcircuit.bepinex.modboneimplantor";
-        public const string Version = "1.1";
+        public const string Version = "1.1.1";
 
         internal static new ManualLogSource Logger;
 
