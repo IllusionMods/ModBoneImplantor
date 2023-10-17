@@ -14,7 +14,9 @@ In short, you want to add BoneImplantProcess components to the bone structure in
 1. If you are using [KoikatsuModdingTools](https://github.com/IllusionMods/KoikatsuModdingTools), you can find BoneImplantProcess in the component list.
 If you are using SB3U, get [this](./BoneImplantProcessForSB3U.unity3d) file and copy the BoneImplantProcess MB from the included animator into your own bundle.
 2. Attach these components on your bones for each of the added bones (either on root bone or on the last bone that exists in the game model). If you are adding a bone that has child bones, you should only add BoneImplantProcess for the topmost bone and not for the child bones. The child bones will be moved together with the topmost bone.
-3. Add and configure any additional components to your extra bones like for example dynamic bones. Your extra bones will be cut out and added to the body bones, so all components you add will be preserved.
+    - trfSrc: Bone to be transplanted (the first custom bone in the chain to be added to the game).
+    - trfDst: Parent bone to transplant to (an existing vanilla game bone that should become the parent of the trfSrc bone).
+4. Add and configure any additional components to your extra bones like for example dynamic bones. Your extra bones will be cut out and added to the body bones, so all components you add will be preserved.
 
 - If your extra bones appear to be locked at 0,0,0 then most likely something went wrong with the setup. Check game log for ModBoneImplantor messages, as long as the components are detected it should tell you what went wrong.
 - You can see a more detailed SB3U tutorial [here](https://github.com/xm007/Koikatsu-Modding/blob/master/Index/X.%20Useful%20links%20for%20quick%20search.md) (and many other modding tutorials).
