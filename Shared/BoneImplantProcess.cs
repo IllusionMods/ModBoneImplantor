@@ -12,14 +12,14 @@ namespace ModBoneImplantor
     public class BoneImplantProcess : MonoBehaviour
     {
         /// <summary>
-        /// Bone to be transplanted
-        /// Do not change field name or references in mods will break
+        /// Bone to be transplanted (the first custom bone in the chain to be added to the game).
+        /// Do not change field name or references in mods will break.
         /// 移植対象のボーン
         /// </summary>
         public Transform trfSrc;
         /// <summary>
-        /// Parent bone to transplant to
-        /// Do not change field name or references in mods will break
+        /// Parent bone to transplant to (an existing vanilla game bone that should become the parent of the trfSrc bone).
+        /// Do not change field name or references in mods will break.
         /// 移植先の親ボーン
         /// </summary>
         public Transform trfDst;
