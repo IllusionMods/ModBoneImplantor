@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ModBoneImplantor for EmotionCreators")]
 #endif
 [assembly: AssemblyDescription("Needed by some clothing mods to add dynamic bones")]
-[assembly: AssemblyCompany("https://github.com/IllusionMods/ModBoneImplantor")]
+[assembly: AssemblyCompany("https://gitgoon.dev/IllusionMods/ModBoneImplantor")]
 [assembly: AssemblyProduct("ModBoneImplantor")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 
