@@ -23,7 +23,7 @@ namespace ModBoneImplantor
                 const string typeName = "KK_Plugins.UncensorSelector, KKS_UncensorSelector";
 #elif HS2
                 const string typeName = "KK_Plugins.UncensorSelector, HS2_UncensorSelector";
-#elif AIS
+#elif AI
                 const string typeName = "KK_Plugins.UncensorSelector, AI_UncensorSelector";
 #endif
                 var mi = Type.GetType(typeName, false)?

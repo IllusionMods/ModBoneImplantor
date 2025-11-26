@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30104.148
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36717.8 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_ModBoneImplantor", "KK_ModBoneImplantor\KK_ModBoneImplantor.csproj", "{BC6F1689-CC99-4980-83B9-9BFB4E5F06D5}"
 EndProject
@@ -15,15 +15,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HS2_ModBoneImplantor", "HS2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI_ModBoneImplantor", "AI_ModBoneImplantor\AI_ModBoneImplantor.csproj", "{C4599439-58BE-4A66-990E-F3CE1C50CA2E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution", "_Solution", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Shared\Shared.projitems*{35c65f5b-c033-49a5-adf2-04af4b418363}*SharedItemsImports = 4
-		Shared\Shared.projitems*{80e4c15b-9dae-4938-b29a-78ae922b7aee}*SharedItemsImports = 13
-		Shared\Shared.projitems*{a62340de-b3d1-4d29-b4ff-d4b4090c1bfa}*SharedItemsImports = 4
-		Shared\Shared.projitems*{b9b1482b-bd28-41ff-887e-a7dc5c0f0be4}*SharedItemsImports = 4
-		Shared\Shared.projitems*{bc6f1689-cc99-4980-83b9-9bfb4e5f06d5}*SharedItemsImports = 4
-		Shared\Shared.projitems*{c4599439-58be-4a66-990e-f3ce1c50ca2e}*SharedItemsImports = 4
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -55,5 +53,13 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {70049F54-6FF3-4437-94BC-5235CFC91CBE}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Shared\Shared.projitems*{35c65f5b-c033-49a5-adf2-04af4b418363}*SharedItemsImports = 5
+		Shared\Shared.projitems*{80e4c15b-9dae-4938-b29a-78ae922b7aee}*SharedItemsImports = 13
+		Shared\Shared.projitems*{a62340de-b3d1-4d29-b4ff-d4b4090c1bfa}*SharedItemsImports = 5
+		Shared\Shared.projitems*{b9b1482b-bd28-41ff-887e-a7dc5c0f0be4}*SharedItemsImports = 5
+		Shared\Shared.projitems*{bc6f1689-cc99-4980-83b9-9bfb4e5f06d5}*SharedItemsImports = 5
+		Shared\Shared.projitems*{c4599439-58be-4a66-990e-f3ce1c50ca2e}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal

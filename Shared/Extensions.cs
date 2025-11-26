@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using HarmonyLib;
 using UnityEngine;
-#if HS2 || AIS
+#if HS2 || AI
 using AIChara;
 #endif
 

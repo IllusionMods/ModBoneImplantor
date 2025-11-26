@@ -1,0 +1,95 @@
+<Project>
+	<PropertyGroup>
+		<!-- This is the master version, only change this one -->
+		<Version>1.1.2</Version>
+
+		<!-- Sets the 'Company' field on the dll file -->
+		<Authors>https://gitgoon.dev/IllusionMods/ModBoneImplantor</Authors>
+		<!-- Sets the 'Copyright' field on the dll file -->
+		<Copyright>Copyright MIT © 2019</Copyright>
+		<!-- Sets the 'Product name' field on the dll file -->
+		<Product>ModBoneImplantor</Product>
+		<!-- Sets the 'File description' field on the dll file -->
+		<AssemblyTitle>Needed by some clothing mods to add dynamic bones</AssemblyTitle>
+
+		<RootNamespace>ModBoneImplantor</RootNamespace>
+		<AssemblyName>ModBoneImplantor</AssemblyName>
+
+		<OutputPath>..\bin\$(MSBuildProjectName)\</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+		<OutputType>Library</OutputType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<Deterministic>true</Deterministic>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>embedded</DebugType>
+		<FileAlignment>512</FileAlignment>
+	</PropertyGroup>
+
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<Optimize>true</Optimize>
+		<!--<GenerateDocumentationFile>True</GenerateDocumentationFile>-->
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'" >
+		<PackageReference Include="BepInEx.Analyzers" Version="1.*" />
+		<PackageReference Include="Microsoft.Unity.Analyzers" Version="1.*" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(MSBuildProjectName.IndexOf(_))' != '-1'">
+		<!--Add constants based on the project name e.g. KK-KKS.Fix_DynamicBones -> KK;KKS;Fix;DynamicBones-->
+		<DefineConstants>$(MSBuildProjectName.Replace('.',';').Replace('-',';').Replace('_',';'))</DefineConstants>
+	</PropertyGroup>
+
+	<!--Delete unnecessary .deps.json file in build output since it's not used in plugins-->
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Delete Files="$(OutputPath)\$(MSBuildProjectName).deps.json" />
+	</Target>
+
+	<!--Do not copy any dlls other than the assembly itself to the build output-->
+	<Target Name="SkipAllRefs" AfterTargets="ResolveReferences">
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
+		</ItemGroup>
+	</Target>
+
+	<!-- Create a release zip file (after successful Release build) -->
+	<Target Name="CreateReleaseZip" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+		<PropertyGroup>
+			<CopyDir>$(OutputPath)\..\TEMP_COPY_$(MSBuildProjectName)</CopyDir>
+		</PropertyGroup>
+		<ItemGroup>
+			<BuildFiles Include="$(OutputPath)\**\*" Exclude="**\*.tmp"/>
+		</ItemGroup>
+
+		<RemoveDir Directories="$(CopyDir)" />
+		<Copy DestinationFolder="$(CopyDir)\BepInEx\plugins\%(RecursiveDir)" SourceFiles="@(BuildFiles)" />
+		<!-- https://learn.microsoft.com/en-us/visualstudio/msbuild/zipdirectory-task?view=vs-2022 -->
+		<ZipDirectory SourceDirectory="$(CopyDir)" DestinationFile="$(OutputPath)\..\$(MSBuildProjectName)_v$(Version).zip" Overwrite="true" />
+		<RemoveDir Directories="$(CopyDir)" />
+	</Target>
+
+	<!-- Allow using of the csproj properties defined above in the code itself -->
+	<Target Name="AddGeneratedConstantsFile" BeforeTargets="BeforeCompile;CoreCompile" Inputs="$(MSBuildAllProjects)" Outputs="$(IntermediateOutputPath)GeneratedConstantsFile.cs">
+		<PropertyGroup>
+			<GeneratedText>
+				<![CDATA[namespace $(RootNamespace) {
+    internal static class Constants {
+        public const string Version = "$(Version)"%3B
+        public const string Name = "$(Product)"%3B
+        public const string Description = "$(AssemblyTitle)"%3B
+        public const string Website = "$(Authors)"%3B
+        public const string Copyright = "$(Copyright)"%3B
+    }
+}]]>
+			</GeneratedText>
+			<GeneratedFilePath>$(IntermediateOutputPath)GeneratedConstantsFile.cs</GeneratedFilePath>
+		</PropertyGroup>
+		<ItemGroup>
+			<Compile Include="$(GeneratedFilePath)" />
+			<FileWrites Include="$(GeneratedFilePath)" />
+		</ItemGroup>
+		<WriteLinesToFile Lines="$(GeneratedText)" File="$(GeneratedFilePath)" WriteOnlyWhenDifferent="true" Overwrite="true" />
+	</Target>
+</Project>
