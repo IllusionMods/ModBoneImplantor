@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using HarmonyLib;
 using IllusionUtility.GetUtility;
 using UniRx;
@@ -11,9 +12,15 @@ namespace ModBoneImplantor
     {
         internal static class AssignedAnotherWeightsHooks
         {
+#if KK
+            private static Type accClothesType = null;
+#endif
             public static void InstallHooks(Harmony hi)
             {
                 hi.PatchAll(typeof(AssignedAnotherWeightsHooks));
+#if KK
+                accClothesType = Type.GetType("KK_Plugins.ChaAccessoryClothes, KK_AccessoryClothes");
+#endif
             }
 
             [HarmonyPrefix]
@@ -43,6 +50,18 @@ namespace ModBoneImplantor
             /// </summary>
             private static bool AssignWeightsAndImplantBones(AssignedAnotherWeights aaw, GameObject obj, string delTopName, Bounds bounds, Transform rootBone)
             {
+#if KK
+                if (accClothesType != null)
+                {
+                    ListInfoComponent[] parentComponents = obj.GetComponentsInParent<ListInfoComponent>(true);
+                    ListInfoComponent listInfoComponent = ((parentComponents != null) ? parentComponents.FirstOrDefault<ListInfoComponent>() : null);
+                    if (listInfoComponent != null && listInfoComponent.GetComponent(accClothesType) != null)
+                    {
+                        obj = listInfoComponent.gameObject;
+                    }
+                }
+                //TODO: Does this need to be handled on the other games? It seems that mods don't require this fix on KKS at least.
+#endif
                 var dictBone = aaw.dictBone;
 
                 var info = TryImplantBones(obj, dictBone);
